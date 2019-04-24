@@ -353,6 +353,8 @@
 
 				parentClassList.add(classes.FORCE_RELATIVE);
 
+				console.log('Set Animated Items', items)
+
 				arrayUtil.forEach(items, function (itemElement, i) {
 					// add items to state
 					if (i >= 0 && !state.items[i] && itemElement !== undefined) {
@@ -1098,7 +1100,22 @@
 			prototype._selectItem = function (selectedIndex) {
 				var ui = this._ui,
 					state = this._state,
-					selectedElement = state.items[selectedIndex].element;
+					selectedElement = state.items[selectedIndex].element,
+					marqueeDiv,
+					widget;
+
+				console.log('Select item at index', selectedIndex, 'Element', selectedElement)
+
+				marqueeDiv = selectedElement.querySelectorAll(".ui-marquee")[0]
+				if (!marqueeDiv) {
+					marqueeDiv = document.createElement("div");
+					marqueeDiv.classList.add("ui-marquee");
+					marqueeDiv.appendChild(selectedElement.firstChild)
+					selectedElement.appendChild(marqueeDiv);
+				}
+
+				widget = ns.widget.Marquee(marqueeDiv);
+				widget.start();
 
 				if (selectedElement.classList.contains(classes.SELECTED)) {
 					showHighlight(ui.arcListviewSelection, selectedElement);
