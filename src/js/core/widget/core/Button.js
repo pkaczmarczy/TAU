@@ -297,7 +297,9 @@
 			 * @protected
 			 * @member ns.widget.core.Button
 			 */
-			prototype._configure = function () {
+			prototype._configure = function (element) {
+				var self = this;
+
 				/**
 				 * Object with default options
 				 * @property {Object} options
@@ -315,7 +317,9 @@
 				 * @member ns.widget.core.Button
 				 * @static
 				 */
-				this.options = ns.util.object.copy(defaultOptions);
+				self.options = ns.util.object.copy(defaultOptions);
+
+				self._readOptionsFromClassList(element);
 			};
 
 			/**
@@ -527,6 +531,37 @@
 
 				self._saveOption("disabled", options.disabled);
 			};
+
+			prototype._readOptionsFromClassList = function (element) {
+				var classList = element.classList,
+					options = this.options;
+				console.log("Read options from classList", element, classList);
+
+				options.inline = classList.contains(classes.INLINE);
+				options.disabled = classList.contains(classes.DISABLED);
+
+				classList.forEach(function (className) {
+					console.log(className);
+					var iconName = className.match(RegExp("\\" + classes.ICON_PREFIX + "([A-Z-][a-z-]*)", "g")),
+						iconPosition = className.match(RegExp("\\" + classes.BTN_ICON + "-(left|right|top|bottom)", "g"));
+					console.log(iconName);
+					console.log(iconPosition);
+
+				});
+				// defaultOptions = {
+				// 	// common options
+				// 	inline: true,
+				// 	icon: null,
+				// 	disabled: false,
+				// 	// mobile options
+				// 	style: null,
+				// 	iconpos: "left",
+				// 	size: null,
+				// 	middle: false,
+				// 	value: null
+				// },
+			}
+
 			/**
 			 * Build Button
 			 * @method _build
