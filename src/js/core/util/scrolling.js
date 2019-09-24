@@ -355,8 +355,10 @@
 				var i,
 					itemIndex,
 					len,
-					snapPoint;
+					snapPoint,
+					distance;
 
+				console.log("getNearestSnapPoint", position, direction, tolerance)
 				if (!snapPoints.length) {
 					return -1;
 				}
@@ -366,27 +368,33 @@
 				}
 
 				len = snapPoints.length;
-				for (i = 0; i < len; i++) {
-					itemIndex = (direction === -1) ? (len - i - 1) : i;
 
-					// omit edge items when tolerance is enabled and direction is toward outside the list
-					// this conditioning allows eg. scrolling into high header
-					if (
-						// tolerance &
-						((itemIndex === 0 && direction === -1) // ||
-						//(itemIndex === (len - 1) && direction !== -1)
-						)
-						) {
-						continue;
-					}
+				console.log("currentIndex", currentIndex);
 
-					snapPoint = snapPoints[itemIndex];
-					if ((snapPoint.position - snapPoint.length / 2 - tolerance) < position &&
-						(snapPoint.position + snapPoint.length / 2 + tolerance) > position) {
-						return itemIndex;
+				var startingIndex = (currentIndex > -1) ? currentIndex : 0;
+
+				var arr = [],
+					min_dist = Infinity,
+					index = -1;
+
+				if (direction == 1) {
+					arr = snapPoints.slice(startingIndex, len);
+				} else {
+					arr = snapPoints.slice(0, startingIndex);
+				}
+
+				for (i = 0; i < arr.length; i++) {
+					distance = Math.abs(arr[i].position - position);
+
+					if (distance < min_dist && distance < 180) {
+						min_dist = distance;
+						index = (direction == 1) ? i + startingIndex : i;
 					}
 				}
-				return -1;
+
+				console.log('return index: ', index);
+
+				return index;
 			}
 
 			/**
@@ -447,11 +455,13 @@
 					moveToPosition += snapSize;
 					scrollDirection = -1;
 				}
+				console.log("Snap Size: ", snapSize)
 
 				// verify range [-maxScrollPosition, 0]
 				moveToPosition = min(max(moveToPosition, -maxScrollPosition), 0);
 
 				// find snap point by scroll posistion
+				console.log("rotary: ", -moveToPosition, halfOfContainer);
 				currentIndex = findSnapPointIndexByScrollPosition(-moveToPosition + halfOfContainer, scrollDirection);
 
 				if (currentIndex > -1) {
